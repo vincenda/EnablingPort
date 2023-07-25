@@ -24,7 +24,7 @@ def linebot():
     # print(json_data)
     
     try:
-#       line bot Channel access token
+    #line bot Channel access token
         line_bot_api = LineBotApi('35409spqhTAQH58C6hlk/mnzIKtDCPGvVGcSVmxC9OQvRWR6C8BZXXH4jJWSeeS4+ONg3zrslQWzzkWxgALtvkzDw5LZMvMz3IVRZIW+RiZQ95YOqzdOmM+ZRT+mwP3np6k2Nw1Li8tmTIkpiMIpqAdB04t89/1O/w1cDnyilFU=')
     #       line bot Channel secret(要改成自己的)
         handler = WebhookHandler('9028c1918534ce7b669b002fcb3d33d1')
@@ -103,4 +103,4 @@ def linebot():
     return 'OK'
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0")
