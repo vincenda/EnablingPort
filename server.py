@@ -10,7 +10,7 @@ from linebot.models import TextSendMessage   # 載入 TextSendMessage 模組
 import json
 
 # 語音轉文字相關套件
-import speech_recognition as sr
+# import speech_recognition as sr
 # 語音轉檔相關套件
 from pydub import AudioSegment
 
@@ -49,51 +49,52 @@ def linebot():
             reply_msg = ''
 
     #       處理語音輸入
-            if Type == "audio":
-    #           將輸入語音先存成語音檔
-                audio_content = line_bot_api.get_message_content(json_data['events'][0]['message']['id'])
-                path='sound.m4a'
-                with open(path, 'wb') as fd:
-                    for chunk in audio_content.iter_content():
-                        fd.write(chunk)
+            # if Type == "audio":
 
-                #進行語音轉文字處理
-                r = sr.Recognizer()
-                #輸入自己的ffmpeg.exe路徑(ffmpeg要額外載，只有windows可使用)
-                AudioSegment.converter = 'ffmpeg-6.0-essentials_build/bin/ffmpeg.exe'
-                sound = AudioSegment.from_file_using_temporary_files(path)
-                path = os.path.splitext(path)[0]+'.wav'
-                sound.export(path, format="wav")
-                with sr.AudioFile(path) as source:
-                    audio = r.record(source)
-                #設定要以什麼文字轉換
-    #           recognize_google表示使用google api
-                text = r.recognize_google(audio,language='zh-TW')
-                print(text)
-                reply_msg=text
+            #     audio_content = line_bot_api.get_message_content(json_data['events'][0]['message']['id'])
+            #     path='sound.m4a'
+            #     with open(path, 'wb') as fd:
+            #         for chunk in audio_content.iter_content():
+            #             fd.write(chunk)
+
+            #     #進行語音轉文字處理
+            #     r = sr.Recognizer()
+            #     #輸入自己的ffmpeg.exe路徑(ffmpeg要額外載，只有windows可使用)
+            #     AudioSegment.converter = 'ffmpeg-6.0-essentials_build/bin/ffmpeg.exe'
+            #     sound = AudioSegment.from_file_using_temporary_files(path)
+            #     path = os.path.splitext(path)[0]+'.wav'
+            #     sound.export(path, format="wav")
+            #     with sr.AudioFile(path) as source:
+            #         audio = r.record(source)
+
+            #     #recognize_google表示使用google api
+            #     text = r.recognize_google(audio,language='zh-TW')
+            #     print(text)
+            #     reply_msg=text
+            # else:
+           
+            msg = json_data['events'][0]['message']['text']
+
+            # 取出文字的前五個字元，轉換成小寫
+            ai_msg = msg[:6].lower()
+
+            # 取出文字的前五個字元是 hi ai:
+            if ai_msg == 'hi ai:':
+                # 將第六個字元之後的訊息發送給 OpenAI
+                response = openai.ChatCompletion.create(
+                    model='gpt-3.5-turbo',
+                    messages=[
+                        {"role":"system", "content":b},
+                        {"role":"user","content":"以上面知識回答問題:"+msg[6:]}
+                    ],
+                    max_tokens=256,
+                    # temperature=0.5,
+                )
+                # 接收到回覆訊息後，移除換行符號
+                # print(response)
+                reply_msg = response["choices"][0]['message']["content"].strip()
             else:
-                msg = json_data['events'][0]['message']['text']
-
-                # 取出文字的前五個字元，轉換成小寫
-                ai_msg = msg[:6].lower()
-
-                # 取出文字的前五個字元是 hi ai:
-                if ai_msg == 'hi ai:':
-                    # 將第六個字元之後的訊息發送給 OpenAI
-                    response = openai.ChatCompletion.create(
-                        model='gpt-3.5-turbo',
-                        messages=[
-                            {"role":"system", "content":b},
-                            {"role":"user","content":"以上面知識回答問題:"+msg[6:]}
-                        ],
-                        max_tokens=256,
-                        # temperature=0.5,
-                    )
-                    # 接收到回覆訊息後，移除換行符號
-                    # print(response)
-                    reply_msg = response["choices"][0]['message']["content"].strip()
-                else:
-                    reply_msg = msg
+                reply_msg = msg
 
             text_message = TextSendMessage(text=reply_msg)
             line_bot_api.reply_message(tk,text_message)
