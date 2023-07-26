@@ -10,12 +10,21 @@ from linebot.models import TextSendMessage   # 載入 TextSendMessage 模組
 import json
 
 # 語音轉文字相關套件
-# import speech_recognition as sr
+import speech_recognition as sr
 # 語音轉檔相關套件
 from pydub import AudioSegment
 
 app = Flask(__name__)
-
+# @app.route('/.well-known/pki-validation/721B0B45EEA984B83C2449B110064E0A.txt')
+# def show_result():
+#     try:
+#         # 讀取result.txt文件的內容
+#         with open('721B0B45EEA984B83C2449B110064E0A.txt', 'r') as file:
+#             content = file.read()
+#         # 將文件內容返回給使用者
+#         return content
+#     except FileNotFoundError:
+#         return "File not found"
 @app.route("/callback", methods=['POST'])
 def linebot():
     body = request.get_data(as_text=True)
@@ -103,4 +112,8 @@ def linebot():
     return 'OK'
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    # app.run(host="0.0.0.0",port="80",ssl_context=('certificate.crt', 'private.key'))
+    app.run()
+
+
+    # certbot certonly --email <vincent255004@gmail.com> -d <enablingport.sytes.net> --agree-tos --manual
